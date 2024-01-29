@@ -1,31 +1,18 @@
 import { Button, IconButton, Progress, useToast } from '@chakra-ui/react';
-import {
-  IconAdjustmentsAlt,
-  IconAdjustmentsPlus,
-  IconBrandTelegram,
-  IconClearAll,
-  IconLoader3,
-  IconMessages,
-  IconMessagesOff,
-  IconMicrophone,
-  IconMicrophoneOff,
-  IconPlayerPause,
-  IconPlayerPlay,
-} from '@tabler/icons-react';
+import { IconBrandTelegram, IconClearAll, IconLoader3 } from '@tabler/icons-react';
 import { useDebounceEffect, useMemoizedFn } from 'ahooks';
 import React, { createRef, useEffect, useRef, useState } from 'react';
 
-import { AutoResizeTextarea } from '../../components';
+import { ContentTextarea } from '@/components';
+
 import { localDB } from '../../utils/LocalDB';
 import { useTranslation } from '../i18n';
-import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
+import { chatConfigStore, chatDataStore, chatListStore } from '../store';
 import type { ChatMessage } from '../types';
 import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
-import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
 import { Recognition } from './Recognition';
-import { SearchSuggestions } from './SearchSuggestions';
 import { estimateTokens } from './token';
 import { UsageTips } from './UsageTips';
 
@@ -40,6 +27,7 @@ export default function Page() {
   const enterSend = chatConfig.enterSend === '1';
   const inputRef = createRef<HTMLTextAreaElement>();
   const [inputContent, setInputContent] = useState('');
+
   const composingRef = useRef(false);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState('');
 
@@ -358,62 +346,7 @@ export default function Page() {
         </Button>
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
-      <div className="mb-4 flex flex-row items-center space-x-3">
-        {ttsPlaying && (
-          <IconButton
-            aria-label="TTS" //
-            onClick={handleTTSClick}
-            colorScheme={ttsPlaying ? 'red' : 'gray'}
-            variant={ttsPlaying ? 'outline' : 'solid'}
-            icon={ttsPlaying ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
-          />
-        )}
-        <IconButton
-          aria-label="ASR" //
-          onClick={handleASRClick}
-          colorScheme={recording ? 'red' : 'gray'}
-          variant={recording ? 'outline' : 'solid'}
-          icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
-        />
-        <IconButton
-          aria-label="Conversation"
-          title="Continuous conversation"
-          colorScheme={currentChat.conversationId ? 'green' : 'gray'}
-          icon={currentChat.conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
-          onClick={handleConversationClick}
-        />
-        <IconButton
-          aria-label="SystemPrompt"
-          title={currentChat.systemMessage}
-          colorScheme={currentChat.systemMessage ? 'telegram' : 'gray'}
-          icon={currentChat.systemMessage ? <IconAdjustmentsPlus stroke={1.5} /> : <IconAdjustmentsAlt stroke={1.5} />}
-          onClick={() => {
-            visibleStore.setState((state) => ({ promptVisible: !state.promptVisible }));
-          }}
-        />
-      </div>
     </div>
-  );
-
-  const renderTips = (
-    <>
-      <Command
-        value={inputContent}
-        onPromptClick={(v) => {
-          setInputContent(v);
-          inputRef.current?.focus();
-        }}
-      />
-      {chatConfig.searchSuggestions === '1' && (
-        <SearchSuggestions
-          value={inputContent}
-          onPromptClick={(v) => {
-            setInputContent(v);
-            inputRef.current?.focus();
-          }}
-        />
-      )}
-    </>
   );
 
   function renderItem(item: ChatMessage | undefined, index: number, isList = false) {
@@ -494,18 +427,18 @@ export default function Page() {
       {chatLoading && <Progress size="xs" isIndeterminate />}
       <div id="chat-bottom-wrapper" className="flex flex-col items-center border-t px-6 pt-3">
         <div className="w-full flex flex-col justify-end space-y-3">
-          {renderTips}
-          <AutoResizeTextarea
+          <ContentTextarea
             ref={inputRef}
             minRows={2}
             maxRows={10}
-            enterKeyHint={enterSend ? 'send' : undefined}
-            className="placeholder:text-[14px]"
-            value={inputContent === '\n' ? '' : inputContent}
+            value={inputContent}
             onCompositionStart={() => (composingRef.current = true)}
             onCompositionEnd={() => (composingRef.current = false)}
             placeholder={enterSend ? t('chat.enterPlaceholder') || '' : t('chat.placeholder') || ''}
-            onChange={(e) => setInputContent(e.target.value)}
+            onChange={(e) => {
+              console.log(e.target.value, '666');
+              setInputContent(e.target.value);
+            }}
             onKeyDown={(e) => {
               if (e.key === 'ArrowUp') {
                 if (!inputContent?.trim()) {

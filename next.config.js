@@ -1,5 +1,6 @@
 const UnoCSS = require('@unocss/webpack').default;
 const { version } = require('./package.json');
+const path = require('node:path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,6 +16,9 @@ const nextConfig = {
     }
     config.plugins.push(UnoCSS());
     return config;
+  },
+  sassOptions: {
+    includePaths: [path.join(__dirname, 'styles')],
   },
 };
 

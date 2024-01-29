@@ -1,13 +1,5 @@
-import { Button, IconButton, Input, Link } from '@chakra-ui/react';
-import {
-  IconBrandGithub,
-  IconCheck,
-  IconEdit,
-  IconLanguageHiragana,
-  IconPlus,
-  IconTrash,
-  IconX,
-} from '@tabler/icons-react';
+import { Button, IconButton, Input } from '@chakra-ui/react';
+import { IconCheck, IconEdit, IconPlus, IconTrash, IconX } from '@tabler/icons-react';
 import { produce } from 'immer';
 import { useState } from 'react';
 
@@ -108,20 +100,6 @@ export function ChatPanel(props: Props) {
       }
       footer={
         <div className="w-full flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center">
-            <Link href="https://github.com/liuw5367/chatgpt-web" isExternal>
-              <IconButton aria-label="Github" variant="ghost" icon={<IconBrandGithub stroke={1.5} />} />
-            </Link>
-            <Button
-              aria-label="ChangeLanguage"
-              variant="ghost"
-              onClick={handleChangeLanguage}
-              leftIcon={<IconLanguageHiragana stroke={1.5} />}
-            >
-              {t('language')}
-            </Button>
-          </div>
-
           <Button
             aria-label="ChangeLanguage"
             variant="outline"
